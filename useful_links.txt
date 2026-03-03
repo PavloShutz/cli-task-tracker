@@ -1,0 +1,1 @@
+1) https://en.wikipedia.org/wiki/Command-line_interface#Command_description_syntax

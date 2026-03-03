@@ -1,7 +1,20 @@
 #include <iostream>
 
-int main()
+void displayHelpInfo()
 {
-    std::cout << "Hello, world!\n";
+    // TODO: Output descriptive help man-like page
+    std::cout << "Help command";
+}
+
+int main(int argc, char *argv[])
+{
+    // Parse CLI commands
+    if (argc < 2)
+    {
+        displayHelpInfo();
+    }
+    else
+    {
+    }
     return 0;
 }
