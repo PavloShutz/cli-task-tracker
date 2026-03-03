@@ -17,6 +17,10 @@ namespace tr
         DONE
     };
 
+    NLOHMANN_JSON_SERIALIZE_ENUM(Status, {{Status::TODO, "todo"},
+                                          {Status::IN_PROGRESS, "in progress"},
+                                          {Status::DONE, "done"}});
+
     struct Task
     {
         int id;
@@ -26,24 +30,7 @@ namespace tr
         std::string updatedAt; // yyyy-mm-dd hh:mm:ss
     };
 
-    void to_json(json &j, const Task &task)
-    {
-        j = json{
-            {"id", task.id},
-            {"status", task.status},
-            {"description", task.description},
-            {"createdAt", task.createdAt},
-            {"updatedAt", task.updatedAt}};
-    }
-
-    void from_json(const json &j, Task &task)
-    {
-        j.at("id").get_to(task.id);
-        j.at("status").get_to(task.status);
-        j.at("description").get_to(task.description);
-        j.at("createdAt").get_to(task.createdAt);
-        j.at("updatedAt").get_to(task.updatedAt);
-    }
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Task, id, status, description, createdAt, updatedAt);
 } // namespace tr
 
 json openJson(const std::string &path)
