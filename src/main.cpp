@@ -1,3 +1,4 @@
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -64,10 +65,21 @@ json openJson(const std::string &path)
     return j;
 }
 
+enum class Action
+{
+    NONE,
+    ADD
+};
+
 void displayHelpInfo()
 {
     // TODO: Output descriptive help man-like page
     std::cout << "Help command";
+}
+
+inline bool equal(const char *str1, const char *str2)
+{
+    return std::strcmp(str1, str2) == 0;
 }
 
 int main(int argc, char *argv[])
@@ -80,6 +92,25 @@ int main(int argc, char *argv[])
     else
     {
         json j = openJson("test.json");
+        Action action = Action::NONE;
+        for (int ndx{}; ndx != argc; ++ndx)
+        {
+            if (equal(argv[ndx], "add") && action == Action::NONE)
+            {
+                action = Action::ADD;
+                continue;
+            }
+            if (action == Action::ADD)
+            {
+                // create new task
+                // TODO: properly track time stamps
+                // TODO: load from and save to file the value of global id
+                tr::Task task{tr::g_id++, tr::Status::TODO, argv[ndx], "-", "-"};
+                json t = task;
+                std::cout << t << std::endl;
+                action = Action::NONE;
+            }
+        }
     }
     return 0;
 }
