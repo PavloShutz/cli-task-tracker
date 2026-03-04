@@ -1,15 +1,14 @@
 #include <cstring>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-namespace tr
+namespace ctt
 {
-    static int g_id = 0;
-
     enum class Status
     {
         TODO,
@@ -31,7 +30,7 @@ namespace tr
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Task, id, status, description, createdAt, updatedAt);
-} // namespace tr
+} // namespace ctt
 
 json openJson(const std::string &path)
 {
@@ -52,11 +51,10 @@ json openJson(const std::string &path)
     return j;
 }
 
-enum class Action
+inline bool equal(const std::string &str1, const std::string &str2)
 {
-    NONE,
-    ADD
-};
+    return str1.compare(str2) == 0;
+}
 
 void displayHelpInfo()
 {
@@ -64,40 +62,92 @@ void displayHelpInfo()
     std::cout << "Help command";
 }
 
-inline bool equal(const char *str1, const char *str2)
+void displayHelpInfo_Add()
 {
-    return std::strcmp(str1, str2) == 0;
+    std::cout << "Usage: task-cli add <description>\n\n";
+    std::cout << "Options: \n";
+    std::cout << "  " << std::left << std::setw(30) << "<description>"
+              << "= A description of the task.\n";
+}
+
+void displayHelpInfo(const char *command)
+{
+    if (equal(command, "add"))
+    {
+        displayHelpInfo_Add();
+    }
+}
+
+void addNewTask(int id, const std::string &description, const std::string &file)
+{
+    const ctt::Task task{id, ctt::Status::TODO, description, "-", "-"};
+    json t = task;
+    std::ofstream ofs(file, std::ios::app);
+    ofs << t.dump() << std::endl;
+}
+
+int loadGlobalId(const std::string &path)
+{
+    std::ifstream ifs(path, std::ios::in);
+    if (!ifs.is_open())
+        return 0;
+
+    int id = 0;
+    ifs >> id;
+    return id;
+}
+
+void updateGlobalId(int id, const std::string &path)
+{
+    std::ofstream ofs(path, std::ios::out);
+    ofs << id;
 }
 
 int main(int argc, char *argv[])
 {
     // Parse CLI commands
-    if (argc < 2)
+    if (argc < 2 || equal(argv[1], "help"))
     {
         displayHelpInfo();
+        return 0;
     }
-    else
+    json j = openJson("test.json");
+    const std::string op = argv[1];
+    const std::string file = "test.json";
+    const std::string id_path = "id.txt";
+
+    if (equal(op, "add"))
     {
-        json j = openJson("test.json");
-        Action action = Action::NONE;
-        for (int ndx{}; ndx != argc; ++ndx)
+        // TODO: properly track time stamps
+        if (argc < 3) // didn't provide any description
         {
-            if (equal(argv[ndx], "add") && action == Action::NONE)
-            {
-                action = Action::ADD;
-                continue;
-            }
-            if (action == Action::ADD)
-            {
-                // create new task
-                // TODO: properly track time stamps
-                // TODO: load from and save to file the value of global id
-                tr::Task task{tr::g_id++, tr::Status::TODO, argv[ndx], "-", "-"};
-                json t = task;
-                std::cout << t << std::endl;
-                action = Action::NONE;
-            }
+            displayHelpInfo("add");
+            return 0;
         }
+        const int id = loadGlobalId(id_path);
+        addNewTask(id, argv[2], file);
+        updateGlobalId(id + 1, id_path);
     }
+    else if (equal(op, "update"))
+    {
+        // TODO
+    }
+    else if (equal(op, "delete"))
+    {
+        // TODO
+    }
+    else if (equal(op, "list"))
+    {
+        // TODO
+    }
+    else if (equal(op, "mark-in-progress"))
+    {
+        // TODO
+    }
+    else if (equal(op, "mark-done"))
+    {
+        // TODO
+    }
+
     return 0;
 }
