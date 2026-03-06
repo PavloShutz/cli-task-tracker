@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
@@ -58,6 +59,12 @@ inline bool equal(const std::string &str1, const std::string &str2)
     return str1.compare(str2) == 0;
 }
 
+void updateJSONFile(const std::string &file, const json &j)
+{
+    std::ofstream ofs(file, std::ios::out | std::ios::trunc);
+    ofs << j.dump(2) << std::endl;
+}
+
 void displayHelpInfo_Add()
 {
     std::cout << "Usage: task-cli add <description>\n\n";
@@ -72,6 +79,14 @@ void displayHelpInfo_List()
     std::cout << "Options: \n";
     std::cout << "  " << std::left << std::setw(30) << "[status]"
               << "= Filter tasks by status (todo, in progress, done). If omitted, all tasks are listed.\n";
+}
+
+void displayHelpInfo_Delete()
+{
+    std::cout << "Usage: task-cli delete <id>\n\n";
+    std::cout << "Options: \n";
+    std::cout << "  " << std::left << std::setw(30) << "<id>"
+              << "= The ID of the task to delete.\n";
 }
 
 void displayHelpInfo()
@@ -90,6 +105,10 @@ void displayHelpInfo(const char *command)
     {
         displayHelpInfo_List();
     }
+    else if (equal(command, "delete"))
+    {
+        displayHelpInfo_Delete();
+    }
     else
     {
         displayHelpInfo();
@@ -101,13 +120,27 @@ void addNewTask(int id, const std::string &description, const std::string &file)
     const ctt::Task task{id, ctt::Status::TODO, description, "-", "-"};
     json j = openJson(file);
     j["tasks"] += task;
-    std::ofstream ofs(file, std::ios::in);
-    ofs << j.dump(2) << std::endl;
+    updateJSONFile(file, j);
+}
+
+void deleteTask(int id, const std::string &file)
+{
+    json j = openJson(file);
+    auto it = j["tasks"].begin();
+    for (; it != j["tasks"].end(); ++it)
+    {
+        if (it.value()["id"].get<std::int64_t>() == id)
+        {
+            j["tasks"].erase(it);
+            break;
+        }
+    }
+    updateJSONFile(file, j);
 }
 
 void listTasks(const std::string &file, const std::string &status = "")
 {
-    json j = openJson(file);
+    const json j = openJson(file);
     for (const auto &task : j["tasks"].items())
     {
         if (equal(status, "") || equal(status, task.value()["status"]))
@@ -132,21 +165,21 @@ int loadGlobalId(const std::string &path)
 
 void updateGlobalId(int id, const std::string &path)
 {
-    std::ofstream ofs(path, std::ios::out);
+    std::ofstream ofs(path, std::ios::out | std::ios::trunc);
     ofs << id;
 }
 
 int main(int argc, char *argv[])
 {
     // Parse CLI commands
-    if (argc < 2 || equal(argv[1], "help"))
+    if (argc < 2 || (equal(argv[1], "help") && argc < 3))
     {
         displayHelpInfo();
         return 0;
     }
 
     const std::string op = argv[1];
-    const std::string file = "test.json";
+    const std::string file = "tasks.json";
     const std::string id_path = "id.txt";
 
     if (equal(op, "add"))
@@ -167,11 +200,14 @@ int main(int argc, char *argv[])
     }
     else if (equal(op, "delete"))
     {
-        // TODO
+        if (argc < 3) // didn't provide any id
+            displayHelpInfo("delete");
+        else
+            deleteTask(std::stoi(argv[2]), file);
     }
     else if (equal(op, "list"))
     {
-        if (argc < 2) // didn't provide any status
+        if (argc < 3) // didn't provide any status
             listTasks(file);
         else
             listTasks(file, argv[2]);
@@ -186,7 +222,7 @@ int main(int argc, char *argv[])
     }
     else if (equal(op, "help"))
     {
-        if (argc < 2) // didn't provide specific command
+        if (argc < 3) // didn't provide specific command
             displayHelpInfo();
         else
             displayHelpInfo(argv[2]);
