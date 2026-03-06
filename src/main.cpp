@@ -47,6 +47,8 @@ json openJson(const std::string &path)
     }
     catch (const json::parse_error &e)
     {
+        j = json::object();
+        j["tasks"] = json::array();
     }
     return j;
 }
@@ -81,9 +83,10 @@ void displayHelpInfo(const char *command)
 void addNewTask(int id, const std::string &description, const std::string &file)
 {
     const ctt::Task task{id, ctt::Status::TODO, description, "-", "-"};
-    json t = task;
-    std::ofstream ofs(file, std::ios::app);
-    ofs << t.dump() << std::endl;
+    json j = openJson(file);
+    j["tasks"] += task;
+    std::ofstream ofs(file, std::ios::in);
+    ofs << j.dump(2) << std::endl;
 }
 
 int loadGlobalId(const std::string &path)
@@ -111,7 +114,7 @@ int main(int argc, char *argv[])
         displayHelpInfo();
         return 0;
     }
-    json j = openJson("test.json");
+
     const std::string op = argv[1];
     const std::string file = "test.json";
     const std::string id_path = "id.txt";
