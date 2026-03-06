@@ -58,12 +58,6 @@ inline bool equal(const std::string &str1, const std::string &str2)
     return str1.compare(str2) == 0;
 }
 
-void displayHelpInfo()
-{
-    // TODO: Output descriptive help man-like page
-    std::cout << "Help command";
-}
-
 void displayHelpInfo_Add()
 {
     std::cout << "Usage: task-cli add <description>\n\n";
@@ -72,11 +66,33 @@ void displayHelpInfo_Add()
               << "= A description of the task.\n";
 }
 
+void displayHelpInfo_List()
+{
+    std::cout << "Usage: task-cli list [status]\n\n";
+    std::cout << "Options: \n";
+    std::cout << "  " << std::left << std::setw(30) << "[status]"
+              << "= Filter tasks by status (todo, in progress, done). If omitted, all tasks are listed.\n";
+}
+
+void displayHelpInfo()
+{
+    // TODO: Output descriptive help man-like page
+    std::cout << "Help command";
+}
+
 void displayHelpInfo(const char *command)
 {
     if (equal(command, "add"))
     {
         displayHelpInfo_Add();
+    }
+    else if (equal(command, "list"))
+    {
+        displayHelpInfo_List();
+    }
+    else
+    {
+        displayHelpInfo();
     }
 }
 
@@ -87,6 +103,20 @@ void addNewTask(int id, const std::string &description, const std::string &file)
     j["tasks"] += task;
     std::ofstream ofs(file, std::ios::in);
     ofs << j.dump(2) << std::endl;
+}
+
+void listTasks(const std::string &file, const std::string &status = "")
+{
+    json j = openJson(file);
+    for (const auto &task : j["tasks"].items())
+    {
+        if (equal(status, "") || equal(status, task.value()["status"]))
+        {
+            std::cout << "Task #" << task.value()["id"] << ":\n\t"
+                      << task.value()["description"] << "\n\t"
+                      << "status: " << task.value()["status"] << '\n';
+        }
+    }
 }
 
 int loadGlobalId(const std::string &path)
@@ -141,7 +171,10 @@ int main(int argc, char *argv[])
     }
     else if (equal(op, "list"))
     {
-        // TODO
+        if (argc < 2) // didn't provide any status
+            listTasks(file);
+        else
+            listTasks(file, argv[2]);
     }
     else if (equal(op, "mark-in-progress"))
     {
@@ -150,6 +183,13 @@ int main(int argc, char *argv[])
     else if (equal(op, "mark-done"))
     {
         // TODO
+    }
+    else if (equal(op, "help"))
+    {
+        if (argc < 2) // didn't provide specific command
+            displayHelpInfo();
+        else
+            displayHelpInfo(argv[2]);
     }
 
     return 0;
