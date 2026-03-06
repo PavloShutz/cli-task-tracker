@@ -14,10 +14,12 @@ namespace ctt
     {
         TODO,
         IN_PROGRESS,
-        DONE
+        DONE,
+        INVALID = -1
     };
 
-    NLOHMANN_JSON_SERIALIZE_ENUM(Status, {{Status::TODO, "todo"},
+    NLOHMANN_JSON_SERIALIZE_ENUM(Status, {{Status::INVALID, nullptr},
+                                          {Status::TODO, "todo"},
                                           {Status::IN_PROGRESS, "in progress"},
                                           {Status::DONE, "done"}});
 
@@ -63,6 +65,23 @@ void updateJSONFile(const std::string &file, const json &j)
 {
     std::ofstream ofs(file, std::ios::out | std::ios::trunc);
     ofs << j.dump(2) << std::endl;
+}
+
+int loadGlobalId(const std::string &path)
+{
+    std::ifstream ifs(path, std::ios::in);
+    if (!ifs.is_open())
+        return 0;
+
+    int id = 0;
+    ifs >> id;
+    return id;
+}
+
+void updateGlobalId(int id, const std::string &path)
+{
+    std::ofstream ofs(path, std::ios::out | std::ios::trunc);
+    ofs << id;
 }
 
 void displayHelpInfo_Add()
@@ -115,12 +134,29 @@ void displayHelpInfo(const char *command)
     }
 }
 
-void addNewTask(int id, const std::string &description, const std::string &file)
+void addNewTask(const std::string &description, const std::string &file, const std::string &id_path)
 {
+    const int id = loadGlobalId(id_path);
     const ctt::Task task{id, ctt::Status::TODO, description, "-", "-"};
     json j = openJson(file);
     j["tasks"] += task;
     updateJSONFile(file, j);
+    updateGlobalId(id + 1, id_path);
+}
+
+void updateTask(int id, const std::string &description, const std::string &file)
+{
+    json j = openJson(file);
+    auto it = j["tasks"].begin();
+    for (; it != j["tasks"].end(); ++it)
+    {
+        if (it.value()["id"].get<std::int64_t>() == id)
+        {
+            it.value()["description"] = description;
+            updateJSONFile(file, j);
+            return;
+        }
+    }
 }
 
 void deleteTask(int id, const std::string &file)
@@ -132,10 +168,10 @@ void deleteTask(int id, const std::string &file)
         if (it.value()["id"].get<std::int64_t>() == id)
         {
             j["tasks"].erase(it);
-            break;
+            updateJSONFile(file, j);
+            return;
         }
     }
-    updateJSONFile(file, j);
 }
 
 void listTasks(const std::string &file, const std::string &status = "")
@@ -150,23 +186,6 @@ void listTasks(const std::string &file, const std::string &status = "")
                       << "status: " << task.value()["status"] << '\n';
         }
     }
-}
-
-int loadGlobalId(const std::string &path)
-{
-    std::ifstream ifs(path, std::ios::in);
-    if (!ifs.is_open())
-        return 0;
-
-    int id = 0;
-    ifs >> id;
-    return id;
-}
-
-void updateGlobalId(int id, const std::string &path)
-{
-    std::ofstream ofs(path, std::ios::out | std::ios::trunc);
-    ofs << id;
 }
 
 int main(int argc, char *argv[])
@@ -186,17 +205,16 @@ int main(int argc, char *argv[])
     {
         // TODO: properly track time stamps
         if (argc < 3) // didn't provide any description
-        {
             displayHelpInfo("add");
-            return 0;
-        }
-        const int id = loadGlobalId(id_path);
-        addNewTask(id, argv[2], file);
-        updateGlobalId(id + 1, id_path);
+        else
+            addNewTask(argv[2], file, id_path);
     }
     else if (equal(op, "update"))
     {
-        // TODO
+        if (argc < 3) // didn't provide any id
+            displayHelpInfo("update");
+        else
+            updateTask(std::stoi(argv[2]), (argc < 4 ? "" : argv[3]), file);
     }
     else if (equal(op, "delete"))
     {
