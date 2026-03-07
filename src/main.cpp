@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 
+#define JSON_HAS_CPP_20 1
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
