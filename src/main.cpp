@@ -21,7 +21,7 @@ namespace ctt
 
     NLOHMANN_JSON_SERIALIZE_ENUM(Status, {{Status::INVALID, nullptr},
                                           {Status::TODO, "todo"},
-                                          {Status::IN_PROGRESS, "in progress"},
+                                          {Status::IN_PROGRESS, "in-progress"},
                                           {Status::DONE, "done"}});
 
     struct Task
@@ -114,7 +114,7 @@ void displayHelpInfo_List()
     std::cout << "Usage: task-cli list [status]\n\n";
     std::cout << "Options: \n";
     std::cout << "  " << std::left << std::setw(30) << "[status]"
-              << "= Filter tasks by status (todo, in progress, done). If omitted, all tasks are listed.\n";
+              << "= Filter tasks by status (todo, in-progress, done). If omitted, all tasks are listed.\n";
 }
 
 void displayHelpInfo_Delete()
@@ -157,6 +157,15 @@ void updateTask(int id, const std::string &description, const std::string &file)
 {
     auto func = [description](auto &j, auto it)
     { it.value()["description"] = description; };
+    modifyTask(id, file, func);
+}
+
+void markTaskStatus(int id, ctt::Status status, const std::string &file)
+{
+    auto func = [status](auto &j, auto it)
+    {
+        it.value()["status"] = status;
+    };
     modifyTask(id, file, func);
 }
 
@@ -225,11 +234,17 @@ int main(int argc, char *argv[])
     }
     else if (equal(op, "mark-in-progress"))
     {
-        // TODO
+        if (argc < 3) // didn't provide any id
+            displayHelpInfo("mark-in-progress");
+        else
+            markTaskStatus(std::stoi(argv[2]), ctt::Status::IN_PROGRESS, file);
     }
     else if (equal(op, "mark-done"))
     {
-        // TODO
+        if (argc < 3) // didn't provide any id
+            displayHelpInfo("mark-done");
+        else
+            markTaskStatus(std::stoi(argv[2]), ctt::Status::DONE, file);
     }
     else if (equal(op, "help"))
     {
