@@ -85,6 +85,22 @@ void updateGlobalId(int id, const std::string &path)
     ofs << id;
 }
 
+template <typename F>
+void modifyTask(int id, const std::string &file, F func)
+{
+    json j = openJson(file);
+    auto it = j["tasks"].begin();
+    for (; it != j["tasks"].end(); ++it)
+    {
+        if (it.value()["id"].get<std::int64_t>() == id)
+        {
+            func(j, it);
+            updateJSONFile(file, j);
+            return;
+        }
+    }
+}
+
 void displayHelpInfo_Add()
 {
     std::cout << "Usage: task-cli add <description>\n\n";
@@ -118,21 +134,13 @@ void displayHelpInfo()
 void displayHelpInfo(const char *command)
 {
     if (equal(command, "add"))
-    {
         displayHelpInfo_Add();
-    }
     else if (equal(command, "list"))
-    {
         displayHelpInfo_List();
-    }
     else if (equal(command, "delete"))
-    {
         displayHelpInfo_Delete();
-    }
     else
-    {
         displayHelpInfo();
-    }
 }
 
 void addNewTask(const std::string &description, const std::string &file, const std::string &id_path)
@@ -147,32 +155,16 @@ void addNewTask(const std::string &description, const std::string &file, const s
 
 void updateTask(int id, const std::string &description, const std::string &file)
 {
-    json j = openJson(file);
-    auto it = j["tasks"].begin();
-    for (; it != j["tasks"].end(); ++it)
-    {
-        if (it.value()["id"].get<std::int64_t>() == id)
-        {
-            it.value()["description"] = description;
-            updateJSONFile(file, j);
-            return;
-        }
-    }
+    auto func = [description](auto &j, auto it)
+    { it.value()["description"] = description; };
+    modifyTask(id, file, func);
 }
 
 void deleteTask(int id, const std::string &file)
 {
-    json j = openJson(file);
-    auto it = j["tasks"].begin();
-    for (; it != j["tasks"].end(); ++it)
-    {
-        if (it.value()["id"].get<std::int64_t>() == id)
-        {
-            j["tasks"].erase(it);
-            updateJSONFile(file, j);
-            return;
-        }
-    }
+    auto func = [](auto &j, auto it)
+    { j["tasks"].erase(it); };
+    modifyTask(id, file, func);
 }
 
 void listTasks(const std::string &file, const std::string &status = "")
