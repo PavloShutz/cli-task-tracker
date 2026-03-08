@@ -3,6 +3,14 @@ Command line task tracker
 
 ![Demonstration](images/record.gif)
 
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+    - [CMake](#cmake)
+    - [Download binaries](#download-binaries)
+- [Usage](#usage)
+- [Examples](#examples)
+
 ## Overview
 ctt strives to provide simple and intuitive interface to use, at the same time being not so overwhelming and scary 👻 to explore. It was implemeneted as a [Task Tracker](https://roadmap.sh/projects/task-tracker) pet-project.
 
