@@ -1,5 +1,7 @@
+#include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -101,6 +103,11 @@ void modifyTask(int id, const std::string &file, F func)
     }
 }
 
+std::string getCurrentUTCTimePoint()
+{
+    return std::format("{0:%F} {0:%H-%M-%OS}", std::chrono::utc_clock::now());
+}
+
 void displayHelpInfo_Add()
 {
     std::cout << "Usage: task-cli add <description>\n\n";
@@ -193,7 +200,8 @@ void displayHelpInfo(const char *command)
 void addNewTask(const std::string &description, const std::string &file, const std::string &id_path)
 {
     const int id = loadGlobalId(id_path);
-    const ctt::Task task{id, ctt::Status::TODO, description, "-", "-"};
+    const std::string createdAt = getCurrentUTCTimePoint();
+    const ctt::Task task{id, ctt::Status::TODO, description, createdAt, createdAt};
     json j = openJson(file);
     j["tasks"] += task;
     updateJSONFile(file, j);
@@ -203,14 +211,20 @@ void addNewTask(const std::string &description, const std::string &file, const s
 void updateTask(int id, const std::string &description, const std::string &file)
 {
     auto func = [description](auto &j, auto it)
-    { it.value()["description"] = description; };
+    {
+        it.value()["description"] = description;
+        it.value()["updatedAt"] = getCurrentUTCTimePoint();
+    };
     modifyTask(id, file, func);
 }
 
 void markTaskStatus(int id, ctt::Status status, const std::string &file)
 {
     auto func = [status](auto &j, auto it)
-    { it.value()["status"] = status; };
+    {
+        it.value()["status"] = status;
+        it.value()["updatedAt"] = getCurrentUTCTimePoint();
+    };
     modifyTask(id, file, func);
 }
 
