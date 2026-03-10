@@ -8,7 +8,11 @@ include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
-set(SOURCES src/main.cpp)
-
+set(SOURCES src/main.cpp src/ui.cpp src/utility.cpp)
 add_executable(task-cli ${SOURCES})
+
+target_include_directories(task-cli
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/include
+)
 target_link_libraries(task-cli PRIVATE nlohmann_json::nlohmann_json)

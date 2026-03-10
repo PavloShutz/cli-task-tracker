@@ -1,0 +1,16 @@
+#include <iostream>
+
+namespace ctt
+{
+    namespace ui
+    {
+        void displayHelpInfo_Add();
+        void displayHelpInfo_List();
+        void displayHelpInfo_Update();
+        void displayHelpInfo_MarkInProgress();
+        void displayHelpInfo_MarkDone();
+        void displayHelpInfo_Delete();
+        void displayHelpInfo();
+        void displayHelpInfo(const char *command);
+    } // namespace ui
+} // namespace ctt
