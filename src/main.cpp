@@ -28,7 +28,7 @@ namespace ctt
 
     struct Task
     {
-        int id;
+        int64_t id;
         Status status;
         std::string description;
         std::string createdAt; // yyyy-mm-dd hh:mm:ss
@@ -37,6 +37,10 @@ namespace ctt
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Task, id, status, description, createdAt, updatedAt);
 } // namespace ctt
+
+// TODO: remove redudant `file`, `path` parameters in function signatures
+constexpr std::string_view json_path = "tasks.json";
+constexpr std::string_view id_path = "id.txt";
 
 json openJson(const std::string &path)
 {
@@ -70,7 +74,7 @@ void updateJSONFile(const std::string &file, const json &j)
     ofs << j.dump(2) << std::endl;
 }
 
-int loadGlobalId(const std::string &path)
+int64_t loadGlobalId(const std::string &path)
 {
     std::ifstream ifs(path, std::ios::in);
     if (!ifs.is_open())
@@ -85,6 +89,11 @@ void updateGlobalId(int id, const std::string &path)
 {
     std::ofstream ofs(path, std::ios::out | std::ios::trunc);
     ofs << id;
+}
+
+int64_t getIDFromUserInput(const char *input)
+{
+    return static_cast<int64_t>(std::stoi(input));
 }
 
 template <typename F>
@@ -199,13 +208,14 @@ void displayHelpInfo(const char *command)
 
 void addNewTask(const std::string &description, const std::string &file, const std::string &id_path)
 {
-    const int id = loadGlobalId(id_path);
+    const int64_t id = loadGlobalId(id_path);
     const std::string createdAt = getCurrentUTCTimePoint();
     const ctt::Task task{id, ctt::Status::TODO, description, createdAt, createdAt};
     json j = openJson(file);
     j["tasks"] += task;
     updateJSONFile(file, j);
     updateGlobalId(id + 1, id_path);
+    std::cout << std::format("Added new task (ID: {})", id);
 }
 
 void updateTask(int id, const std::string &description, const std::string &file)
@@ -231,7 +241,9 @@ void markTaskStatus(int id, ctt::Status status, const std::string &file)
 void deleteTask(int id, const std::string &file)
 {
     auto func = [](auto &j, auto it)
-    { j["tasks"].erase(it); };
+    {
+        j["tasks"].erase(it);
+    };
     modifyTask(id, file, func);
 }
 
@@ -242,9 +254,12 @@ void listTasks(const std::string &file, const std::string &status = "")
     {
         if (equal(status, "") || equal(status, task.value()["status"]))
         {
-            std::cout << "Task #" << task.value()["id"] << ":\n\t"
-                      << task.value()["description"] << "\n\t"
-                      << "status: " << task.value()["status"] << '\n';
+            std::cout << std::format("Task #{}:\n\t{}\n\tstatus:{}\n\tcreated:{}\n\tlast updated:{}\n",
+                                     task.value()["id"].get<int64_t>(),
+                                     task.value()["description"].get<std::string>(),
+                                     task.value()["status"].get<std::string>(),
+                                     task.value()["createdAt"].get<std::string>(),
+                                     task.value()["updatedAt"].get<std::string>());
         }
     }
 }
@@ -275,14 +290,40 @@ int main(int argc, char *argv[])
         if (argc < 3) // didn't provide any id
             displayHelpInfo("update");
         else
-            updateTask(std::stoi(argv[2]), (argc < 4 ? "" : argv[3]), file);
+            try
+            {
+                updateTask(getIDFromUserInput(argv[2]), (argc < 4 ? "" : argv[3]), file);
+            }
+            catch (std::invalid_argument)
+            {
+                std::cout << "ID must be a valid integer\n";
+                return 0;
+            }
+            catch (std::out_of_range)
+            {
+                std::cout << "ID value is out of range\n";
+                return 0;
+            }
     }
     else if (equal(op, "delete"))
     {
         if (argc < 3) // didn't provide any id
             displayHelpInfo("delete");
         else
-            deleteTask(std::stoi(argv[2]), file);
+            try
+            {
+                deleteTask(getIDFromUserInput(argv[2]), file);
+            }
+            catch (std::invalid_argument)
+            {
+                std::cout << "ID must be a valid integer\n";
+                return 0;
+            }
+            catch (std::out_of_range)
+            {
+                std::cout << "ID value is out of range\n";
+                return 0;
+            }
     }
     else if (equal(op, "list"))
     {
@@ -296,14 +337,40 @@ int main(int argc, char *argv[])
         if (argc < 3) // didn't provide any id
             displayHelpInfo("mark-in-progress");
         else
-            markTaskStatus(std::stoi(argv[2]), ctt::Status::IN_PROGRESS, file);
+            try
+            {
+                markTaskStatus(getIDFromUserInput(argv[2]), ctt::Status::IN_PROGRESS, file);
+            }
+            catch (std::invalid_argument)
+            {
+                std::cout << "ID must be a valid integer\n";
+                return 0;
+            }
+            catch (std::out_of_range)
+            {
+                std::cout << "ID value is out of range\n";
+                return 0;
+            }
     }
     else if (equal(op, "mark-done"))
     {
         if (argc < 3) // didn't provide any id
             displayHelpInfo("mark-done");
         else
-            markTaskStatus(std::stoi(argv[2]), ctt::Status::DONE, file);
+            try
+            {
+                markTaskStatus(getIDFromUserInput(argv[2]), ctt::Status::DONE, file);
+            }
+            catch (std::invalid_argument)
+            {
+                std::cout << "ID must be a valid integer\n";
+                return 0;
+            }
+            catch (std::out_of_range)
+            {
+                std::cout << "ID value is out of range\n";
+                return 0;
+            }
     }
     else if (equal(op, "help"))
     {
@@ -311,6 +378,10 @@ int main(int argc, char *argv[])
             displayHelpInfo();
         else
             displayHelpInfo(argv[2]);
+    }
+    else
+    {
+        displayHelpInfo();
     }
 
     return 0;
