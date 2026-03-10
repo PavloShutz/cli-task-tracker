@@ -1,3 +1,6 @@
+#ifndef TASK_HPP
+#define TASK_HPP
+
 #include <string>
 
 #include "ctt/utility.hpp"
@@ -42,3 +45,5 @@ namespace ctt
 
     } // namespace task
 } // namespace ctt
+
+#endif // TASK_HPP

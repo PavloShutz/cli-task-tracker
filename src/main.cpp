@@ -25,15 +25,14 @@ int main(int argc, char *argv[])
 
     if (equal(op, "add"))
     {
-        // TODO: properly track time stamps
-        if (argc < 3) // didn't provide any description
+        if (argc < 3) // no description
             displayHelpInfo("add");
         else
             addNewTask(argv[2], file, id_path);
     }
     else if (equal(op, "update"))
     {
-        if (argc < 3) // didn't provide any id
+        if (argc < 3) // no id
             displayHelpInfo("update");
         else
             try
@@ -53,7 +52,7 @@ int main(int argc, char *argv[])
     }
     else if (equal(op, "delete"))
     {
-        if (argc < 3) // didn't provide any id
+        if (argc < 3) // no id
             displayHelpInfo("delete");
         else
             try
@@ -73,14 +72,14 @@ int main(int argc, char *argv[])
     }
     else if (equal(op, "list"))
     {
-        if (argc < 3) // didn't provide any status
+        if (argc < 3) // no status
             listTasks(file);
         else
             listTasks(file, argv[2]);
     }
     else if (equal(op, "mark-in-progress"))
     {
-        if (argc < 3) // didn't provide any id
+        if (argc < 3) // no id
             displayHelpInfo("mark-in-progress");
         else
             try
@@ -100,7 +99,7 @@ int main(int argc, char *argv[])
     }
     else if (equal(op, "mark-done"))
     {
-        if (argc < 3) // didn't provide any id
+        if (argc < 3) // no id
             displayHelpInfo("mark-done");
         else
             try

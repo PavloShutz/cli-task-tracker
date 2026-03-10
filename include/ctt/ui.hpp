@@ -1,3 +1,6 @@
+#ifndef UI_HPP
+#define UI_HPP
+
 #include <iostream>
 
 namespace ctt
@@ -14,3 +17,5 @@ namespace ctt
         void displayHelpInfo(const char *command);
     } // namespace ui
 } // namespace ctt
+
+#endif // UI_HPP
