@@ -1,6 +1,6 @@
 #include <string>
 
-#include "utility.hpp"
+#include "ctt/utility.hpp"
 
 namespace ctt
 {
@@ -29,5 +29,16 @@ namespace ctt
         };
 
         NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Task, id, status, description, createdAt, updatedAt);
+
+        void addNewTask(const std::string &description, const std::string &file, const std::string &id_path);
+
+        void updateTask(int id, const std::string &description, const std::string &file);
+
+        void markTaskStatus(int id, ctt::task::Status status, const std::string &file);
+
+        void deleteTask(int id, const std::string &file);
+
+        void listTasks(const std::string &file, const std::string &status = "");
+
     } // namespace task
 } // namespace ctt
