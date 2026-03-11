@@ -11,16 +11,16 @@ namespace ctt
     {
         enum class Status
         {
-            TODO,
-            IN_PROGRESS,
-            DONE,
-            INVALID = -1
+            Todo,
+            In_Progress,
+            Done,
+            Invalid = -1
         };
 
-        NLOHMANN_JSON_SERIALIZE_ENUM(Status, {{Status::INVALID, nullptr},
-                                              {Status::TODO, "todo"},
-                                              {Status::IN_PROGRESS, "in-progress"},
-                                              {Status::DONE, "done"}});
+        NLOHMANN_JSON_SERIALIZE_ENUM(Status, {{Status::Invalid, nullptr},
+                                              {Status::Todo, "todo"},
+                                              {Status::In_Progress, "in-progress"},
+                                              {Status::Done, "done"}});
 
         struct Task
         {
@@ -33,15 +33,15 @@ namespace ctt
 
         NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Task, id, status, description, createdAt, updatedAt);
 
-        void addNewTask(const std::string &description, const std::string &file, const std::string &id_path);
+        void addNewTask(const std::string &description);
 
-        void updateTask(int id, const std::string &description, const std::string &file);
+        void updateTask(int64_t id, const std::string &description);
 
-        void markTaskStatus(int id, ctt::task::Status status, const std::string &file);
+        void markTaskStatus(int64_t id, ctt::task::Status status);
 
-        void deleteTask(int id, const std::string &file);
+        void deleteTask(int64_t id);
 
-        void listTasks(const std::string &file, const std::string &status = "");
+        void listTasks(const std::string &status = "");
 
     } // namespace task
 } // namespace ctt

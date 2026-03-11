@@ -2,9 +2,9 @@
 
 #include <fstream>
 
-json openJSON(const std::string &path)
+json openJSON()
 {
-    std::fstream f(path);
+    std::fstream f{std::string(file_path)};
     json j;
     try
     {
@@ -18,25 +18,25 @@ json openJSON(const std::string &path)
     return j;
 }
 
-void updateJSONFile(const std::string &file, const json &j)
+void updateJSON(const json &j)
 {
-    std::ofstream ofs(file, std::ios::out | std::ios::trunc);
+    std::ofstream ofs{std::string(file_path), std::ios::out | std::ios::trunc};
     ofs << j.dump(2) << std::endl;
 }
 
-int64_t loadGlobalId(const std::string &path)
+int64_t loadGlobalId()
 {
-    std::ifstream ifs(path, std::ios::in);
+    std::ifstream ifs{std::string(id_path), std::ios::in};
     if (!ifs.is_open())
         return 0;
 
-    int id = 0;
+    int64_t id = 0;
     ifs >> id;
     return id;
 }
 
-void updateGlobalId(int id, const std::string &path)
+void updateGlobalId(int id)
 {
-    std::ofstream ofs(path, std::ios::out | std::ios::trunc);
+    std::ofstream ofs{std::string(id_path), std::ios::out | std::ios::trunc};
     ofs << id;
 }

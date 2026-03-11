@@ -5,65 +5,65 @@
 using namespace ctt;
 
 template <typename F>
-void modifyTask(int id, const std::string &file, F func)
+void modifyTask(int id, F func)
 {
-    json j = openJSON(file);
+    json j = openJSON();
     auto it = j["tasks"].begin();
     for (; it != j["tasks"].end(); ++it)
     {
         if (it.value()["id"].get<std::int64_t>() == id)
         {
             func(j, it);
-            updateJSONFile(file, j);
+            updateJSON(j);
             return;
         }
     }
 }
 
-void task::addNewTask(const std::string &description, const std::string &file, const std::string &id_path)
+void task::addNewTask(const std::string &description)
 {
-    const int64_t id = loadGlobalId(id_path);
+    const int64_t id = loadGlobalId();
     const std::string createdAt = getCurrentUTCTimePoint();
-    const Task task{id, Status::TODO, description, createdAt, createdAt};
-    json j = openJSON(file);
+    const Task task{id, Status::Todo, description, createdAt, createdAt};
+    json j = openJSON();
     j["tasks"] += task;
-    updateJSONFile(file, j);
-    updateGlobalId(id + 1, id_path);
+    updateJSON(j);
+    updateGlobalId(id + 1);
     std::cout << std::format("Added new task (ID: {})", id);
 }
 
-void task::updateTask(int id, const std::string &description, const std::string &file)
+void task::updateTask(int64_t id, const std::string &description)
 {
     auto func = [description](auto &j, auto it)
     {
         it.value()["description"] = description;
         it.value()["updatedAt"] = getCurrentUTCTimePoint();
     };
-    modifyTask(id, file, func);
+    modifyTask(id, func);
 }
 
-void task::markTaskStatus(int id, ctt::task::Status status, const std::string &file)
+void task::markTaskStatus(int64_t id, ctt::task::Status status)
 {
     auto func = [status](auto &j, auto it)
     {
         it.value()["status"] = status;
         it.value()["updatedAt"] = getCurrentUTCTimePoint();
     };
-    modifyTask(id, file, func);
+    modifyTask(id, func);
 }
 
-void task::deleteTask(int id, const std::string &file)
+void task::deleteTask(int64_t id)
 {
     auto func = [](auto &j, auto it)
     {
         j["tasks"].erase(it);
     };
-    modifyTask(id, file, func);
+    modifyTask(id, func);
 }
 
-void task::listTasks(const std::string &file, const std::string &status)
+void task::listTasks(const std::string &status)
 {
-    const json j = openJSON(file);
+    const json j = openJSON();
     for (const auto &task : j["tasks"].items())
     {
         const auto &value = task.value();

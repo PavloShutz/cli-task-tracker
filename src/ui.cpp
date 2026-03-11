@@ -78,7 +78,7 @@ void ui::displayHelpInfo()
               << "Show help for a specific command.\n";
 }
 
-void ui::displayHelpInfo(const std::string &command)
+void ui::displayHelpInfo(const std::string_view command)
 {
     if (command == "add")
         displayHelpInfo_Add();

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string_view>
 
 #include "ctt/task.hpp"
 #include "ctt/ui.hpp"
@@ -14,16 +15,14 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    const std::string op = argv[1];
-    const std::string file = "tasks.json";
-    const std::string id_path = "id.txt";
+    const std::string_view op = argv[1];
 
     if (op == "add")
     {
         if (argc < 3) // no description
             displayHelpInfo("add");
         else
-            addNewTask(argv[2], file, id_path);
+            addNewTask(argv[2]);
     }
     else if (op == "update")
     {
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
         else
             try
             {
-                updateTask(getIDFromUserInput(argv[2]), (argc < 4 ? "" : argv[3]), file);
+                updateTask(getIDFromUserInput(argv[2]), (argc < 4 ? "" : argv[3]));
             }
             catch (const std::invalid_argument &)
             {
@@ -50,7 +49,7 @@ int main(int argc, char *argv[])
         else
             try
             {
-                deleteTask(getIDFromUserInput(argv[2]), file);
+                deleteTask(getIDFromUserInput(argv[2]));
             }
             catch (const std::invalid_argument &)
             {
@@ -64,9 +63,9 @@ int main(int argc, char *argv[])
     else if (op == "list")
     {
         if (argc < 3) // no status
-            listTasks(file);
+            listTasks();
         else
-            listTasks(file, argv[2]);
+            listTasks(argv[2]);
     }
     else if (op == "mark-in-progress")
     {
@@ -75,7 +74,7 @@ int main(int argc, char *argv[])
         else
             try
             {
-                markTaskStatus(getIDFromUserInput(argv[2]), Status::IN_PROGRESS, file);
+                markTaskStatus(getIDFromUserInput(argv[2]), Status::In_Progress);
             }
             catch (const std::invalid_argument &)
             {
@@ -93,7 +92,7 @@ int main(int argc, char *argv[])
         else
             try
             {
-                markTaskStatus(getIDFromUserInput(argv[2]), Status::DONE, file);
+                markTaskStatus(getIDFromUserInput(argv[2]), Status::Done);
             }
             catch (const std::invalid_argument &)
             {

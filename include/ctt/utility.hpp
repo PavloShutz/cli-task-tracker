@@ -4,11 +4,15 @@
 #include <chrono>
 #include <format>
 #include <string>
+#include <string_view>
 
 #define JSON_HAS_CPP_20 1
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
+
+constexpr std::string_view file_path = "tasks.json";
+constexpr std::string_view id_path = "id.txt";
 
 inline std::string getCurrentUTCTimePoint()
 {
@@ -21,10 +25,10 @@ inline int64_t getIDFromUserInput(const char *input)
 }
 
 // JSON helper functions
-json openJSON(const std::string &path);
-void updateJSONFile(const std::string &file, const json &j);
+json openJSON();
+void updateJSON(const json &j);
 
-int64_t loadGlobalId(const std::string &path);
-void updateGlobalId(int id, const std::string &path);
+int64_t loadGlobalId();
+void updateGlobalId(int id);
 
 #endif // UTILITY_HPP
