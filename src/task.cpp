@@ -66,14 +66,15 @@ void task::listTasks(const std::string &file, const std::string &status)
     const json j = openJSON(file);
     for (const auto &task : j["tasks"].items())
     {
-        if (equal(status, "") || equal(status, task.value()["status"]))
+        const auto &value = task.value();
+        if ((status == "") || (status == value["status"].get<std::string>()))
         {
             std::cout << std::format("Task #{}:\n\t{}\n\tstatus:{}\n\tcreated:{}\n\tlast updated:{}\n",
-                                     task.value()["id"].get<int64_t>(),
-                                     task.value()["description"].get<std::string>(),
-                                     task.value()["status"].get<std::string>(),
-                                     task.value()["createdAt"].get<std::string>(),
-                                     task.value()["updatedAt"].get<std::string>());
+                                     value["id"].get<int64_t>(),
+                                     value["description"].get<std::string>(),
+                                     value["status"].get<std::string>(),
+                                     value["createdAt"].get<std::string>(),
+                                     value["updatedAt"].get<std::string>());
         }
     }
 }

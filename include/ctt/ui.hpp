@@ -1,7 +1,7 @@
 #ifndef UI_HPP
 #define UI_HPP
 
-#include <iostream>
+#include <string>
 
 namespace ctt
 {
@@ -14,7 +14,7 @@ namespace ctt
         void displayHelpInfo_MarkDone();
         void displayHelpInfo_Delete();
         void displayHelpInfo();
-        void displayHelpInfo(const char *command);
+        void displayHelpInfo(const std::string &command);
     } // namespace ui
 } // namespace ctt
 

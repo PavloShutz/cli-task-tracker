@@ -1,7 +1,3 @@
-#include <cstdio>
-#include <cstring>
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 
 #include "ctt/task.hpp"
@@ -12,8 +8,7 @@ int main(int argc, char *argv[])
     using namespace ctt::ui;
     using namespace ctt::task;
 
-    // Parse CLI commands
-    if (argc < 2 || (equal(argv[1], "help") && argc < 3))
+    if (argc < 2)
     {
         displayHelpInfo();
         return 0;
@@ -23,14 +18,14 @@ int main(int argc, char *argv[])
     const std::string file = "tasks.json";
     const std::string id_path = "id.txt";
 
-    if (equal(op, "add"))
+    if (op == "add")
     {
         if (argc < 3) // no description
             displayHelpInfo("add");
         else
             addNewTask(argv[2], file, id_path);
     }
-    else if (equal(op, "update"))
+    else if (op == "update")
     {
         if (argc < 3) // no id
             displayHelpInfo("update");
@@ -39,18 +34,16 @@ int main(int argc, char *argv[])
             {
                 updateTask(getIDFromUserInput(argv[2]), (argc < 4 ? "" : argv[3]), file);
             }
-            catch (std::invalid_argument)
+            catch (const std::invalid_argument &)
             {
-                std::cout << "ID must be a valid integer\n";
-                return 0;
+                std::cerr << "ID must be a valid integer\n";
             }
-            catch (std::out_of_range)
+            catch (const std::out_of_range &)
             {
-                std::cout << "ID value is out of range\n";
-                return 0;
+                std::cerr << "ID value is out of range\n";
             }
     }
-    else if (equal(op, "delete"))
+    else if (op == "delete")
     {
         if (argc < 3) // no id
             displayHelpInfo("delete");
@@ -59,25 +52,23 @@ int main(int argc, char *argv[])
             {
                 deleteTask(getIDFromUserInput(argv[2]), file);
             }
-            catch (std::invalid_argument)
+            catch (const std::invalid_argument &)
             {
-                std::cout << "ID must be a valid integer\n";
-                return 0;
+                std::cerr << "ID must be a valid integer\n";
             }
-            catch (std::out_of_range)
+            catch (const std::out_of_range &)
             {
-                std::cout << "ID value is out of range\n";
-                return 0;
+                std::cerr << "ID value is out of range\n";
             }
     }
-    else if (equal(op, "list"))
+    else if (op == "list")
     {
         if (argc < 3) // no status
             listTasks(file);
         else
             listTasks(file, argv[2]);
     }
-    else if (equal(op, "mark-in-progress"))
+    else if (op == "mark-in-progress")
     {
         if (argc < 3) // no id
             displayHelpInfo("mark-in-progress");
@@ -86,18 +77,16 @@ int main(int argc, char *argv[])
             {
                 markTaskStatus(getIDFromUserInput(argv[2]), Status::IN_PROGRESS, file);
             }
-            catch (std::invalid_argument)
+            catch (const std::invalid_argument &)
             {
-                std::cout << "ID must be a valid integer\n";
-                return 0;
+                std::cerr << "ID must be a valid integer\n";
             }
-            catch (std::out_of_range)
+            catch (const std::out_of_range &)
             {
-                std::cout << "ID value is out of range\n";
-                return 0;
+                std::cerr << "ID value is out of range\n";
             }
     }
-    else if (equal(op, "mark-done"))
+    else if (op == "mark-done")
     {
         if (argc < 3) // no id
             displayHelpInfo("mark-done");
@@ -106,18 +95,16 @@ int main(int argc, char *argv[])
             {
                 markTaskStatus(getIDFromUserInput(argv[2]), Status::DONE, file);
             }
-            catch (std::invalid_argument)
+            catch (const std::invalid_argument &)
             {
-                std::cout << "ID must be a valid integer\n";
-                return 0;
+                std::cerr << "ID must be a valid integer\n";
             }
-            catch (std::out_of_range)
+            catch (const std::out_of_range &)
             {
-                std::cout << "ID value is out of range\n";
-                return 0;
+                std::cerr << "ID value is out of range\n";
             }
     }
-    else if (equal(op, "help"))
+    else if (op == "help")
     {
         if (argc < 3) // didn't provide specific command
             displayHelpInfo();

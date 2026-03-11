@@ -1,6 +1,7 @@
 #include "ctt/ui.hpp"
 
 #include <iomanip>
+#include <iostream>
 
 #include "ctt/utility.hpp"
 
@@ -77,19 +78,19 @@ void ui::displayHelpInfo()
               << "Show help for a specific command.\n";
 }
 
-void ui::displayHelpInfo(const char *command)
+void ui::displayHelpInfo(const std::string &command)
 {
-    if (equal(command, "add"))
+    if (command == "add")
         displayHelpInfo_Add();
-    else if (equal(command, "update"))
+    else if (command == "update")
         displayHelpInfo_Update();
-    else if (equal(command, "list"))
+    else if (command == "list")
         displayHelpInfo_List();
-    else if (equal(command, "delete"))
+    else if (command == "delete")
         displayHelpInfo_Delete();
-    else if (equal(command, "mark-in-progress"))
+    else if (command == "mark-in-progress")
         displayHelpInfo_MarkInProgress();
-    else if (equal(command, "mark-done"))
+    else if (command == "mark-done")
         displayHelpInfo_MarkDone();
     else
         displayHelpInfo();

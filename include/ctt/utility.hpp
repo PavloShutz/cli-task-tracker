@@ -10,11 +10,6 @@
 
 using json = nlohmann::json;
 
-inline bool equal(const std::string &str1, const std::string &str2)
-{
-    return str1.compare(str2) == 0;
-}
-
 inline std::string getCurrentUTCTimePoint()
 {
     return std::format("{0:%F} {0:%H-%M-%OS}", std::chrono::utc_clock::now());
