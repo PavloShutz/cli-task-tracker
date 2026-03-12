@@ -33,13 +33,9 @@ int main(int argc, char *argv[])
             {
                 updateTask(getIDFromUserInput(argv[2]), (argc < 4 ? "" : argv[3]));
             }
-            catch (const std::invalid_argument &)
+            catch (const std::runtime_error &e)
             {
-                std::cerr << "ID must be a valid integer\n";
-            }
-            catch (const std::out_of_range &)
-            {
-                std::cerr << "ID value is out of range\n";
+                std::cerr << e.what() << std::endl;
             }
     }
     else if (op == "delete")
@@ -51,13 +47,9 @@ int main(int argc, char *argv[])
             {
                 deleteTask(getIDFromUserInput(argv[2]));
             }
-            catch (const std::invalid_argument &)
+            catch (const std::runtime_error &e)
             {
-                std::cerr << "ID must be a valid integer\n";
-            }
-            catch (const std::out_of_range &)
-            {
-                std::cerr << "ID value is out of range\n";
+                std::cerr << e.what() << std::endl;
             }
     }
     else if (op == "list")
@@ -76,13 +68,9 @@ int main(int argc, char *argv[])
             {
                 markTaskStatus(getIDFromUserInput(argv[2]), Status::In_Progress);
             }
-            catch (const std::invalid_argument &)
+            catch (const std::runtime_error &e)
             {
-                std::cerr << "ID must be a valid integer\n";
-            }
-            catch (const std::out_of_range &)
-            {
-                std::cerr << "ID value is out of range\n";
+                std::cerr << e.what() << std::endl;
             }
     }
     else if (op == "mark-done")
@@ -94,13 +82,9 @@ int main(int argc, char *argv[])
             {
                 markTaskStatus(getIDFromUserInput(argv[2]), Status::Done);
             }
-            catch (const std::invalid_argument &)
+            catch (const std::runtime_error &e)
             {
-                std::cerr << "ID must be a valid integer\n";
-            }
-            catch (const std::out_of_range &)
-            {
-                std::cerr << "ID value is out of range\n";
+                std::cerr << e.what() << std::endl;
             }
     }
     else if (op == "help")

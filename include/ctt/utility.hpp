@@ -1,8 +1,11 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
 
+#include <charconv>
 #include <chrono>
+#include <cstring>
 #include <format>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
@@ -21,7 +24,12 @@ inline std::string getCurrentUTCTimePoint()
 
 inline int64_t getIDFromUserInput(const char *input)
 {
-    return static_cast<int64_t>(std::stoi(input));
+    int64_t value = 0;
+    if (std::from_chars(input, input + std::strlen(input), value).ec != std::errc())
+    {
+        throw std::runtime_error{"Couldn't interpret " + std::string(input) + " as a valid numeric id."};
+    }
+    return value;
 }
 
 // JSON helper functions
