@@ -5,7 +5,7 @@
 using namespace ctt;
 
 template <typename F>
-void modifyTask(int id, F func)
+void modifyTask(std::int64_t id, F func)
 {
     json j = openJSON();
     auto it = j["tasks"].begin();
@@ -22,7 +22,7 @@ void modifyTask(int id, F func)
 
 void task::addNewTask(const std::string &description)
 {
-    const int64_t id = loadGlobalId();
+    const std::int64_t id = loadGlobalId();
     const std::string createdAt = getCurrentUTCTimePoint();
     const Task task{id, Status::Todo, description, createdAt, createdAt};
     json j = openJSON();
@@ -32,7 +32,7 @@ void task::addNewTask(const std::string &description)
     std::cout << std::format("Added new task (ID: {})", id);
 }
 
-void task::updateTask(int64_t id, const std::string &description)
+void task::updateTask(std::int64_t id, const std::string &description)
 {
     auto func = [description](auto &j, auto it)
     {
@@ -42,7 +42,7 @@ void task::updateTask(int64_t id, const std::string &description)
     modifyTask(id, func);
 }
 
-void task::markTaskStatus(int64_t id, ctt::task::Status status)
+void task::markTaskStatus(std::int64_t id, ctt::task::Status status)
 {
     auto func = [status](auto &j, auto it)
     {
@@ -52,7 +52,7 @@ void task::markTaskStatus(int64_t id, ctt::task::Status status)
     modifyTask(id, func);
 }
 
-void task::deleteTask(int64_t id)
+void task::deleteTask(std::int64_t id)
 {
     auto func = [](auto &j, auto it)
     {

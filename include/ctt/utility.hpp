@@ -3,6 +3,7 @@
 
 #include <charconv>
 #include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <format>
 #include <stdexcept>
@@ -22,9 +23,9 @@ inline std::string getCurrentUTCTimePoint()
     return std::format("{0:%F} {0:%H-%M-%OS}", std::chrono::utc_clock::now());
 }
 
-inline int64_t getIDFromUserInput(const char *input)
+inline std::int64_t getIDFromUserInput(const char *input)
 {
-    int64_t value = 0;
+    std::int64_t value = 0;
     if (std::from_chars(input, input + std::strlen(input), value).ec != std::errc())
     {
         throw std::runtime_error{"Couldn't interpret " + std::string(input) + " as a valid numeric id."};
@@ -36,7 +37,7 @@ inline int64_t getIDFromUserInput(const char *input)
 json openJSON();
 void updateJSON(const json &j);
 
-int64_t loadGlobalId();
-void updateGlobalId(int id);
+std::int64_t loadGlobalId();
+void updateGlobalId(std::int64_t id);
 
 #endif // UTILITY_HPP

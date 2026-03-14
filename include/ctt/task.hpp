@@ -24,7 +24,7 @@ namespace ctt
 
         struct Task
         {
-            int64_t id;
+            std::int64_t id;
             Status status;
             std::string description;
             std::string createdAt; // yyyy-mm-dd hh:mm:ss
@@ -35,11 +35,11 @@ namespace ctt
 
         void addNewTask(const std::string &description);
 
-        void updateTask(int64_t id, const std::string &description);
+        void updateTask(std::int64_t id, const std::string &description);
 
-        void markTaskStatus(int64_t id, ctt::task::Status status);
+        void markTaskStatus(std::int64_t id, ctt::task::Status status);
 
-        void deleteTask(int64_t id);
+        void deleteTask(std::int64_t id);
 
         void listTasks(const std::string &status = "");
 

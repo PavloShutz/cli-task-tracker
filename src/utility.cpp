@@ -24,18 +24,18 @@ void updateJSON(const json &j)
     ofs << j.dump(2) << std::endl;
 }
 
-int64_t loadGlobalId()
+std::int64_t loadGlobalId()
 {
     std::ifstream ifs{std::string(id_path), std::ios::in};
     if (!ifs.is_open())
         return 0;
 
-    int64_t id = 0;
+    std::int64_t id = 0;
     ifs >> id;
     return id;
 }
 
-void updateGlobalId(int id)
+void updateGlobalId(std::int64_t id)
 {
     std::ofstream ofs{std::string(id_path), std::ios::out | std::ios::trunc};
     ofs << id;
