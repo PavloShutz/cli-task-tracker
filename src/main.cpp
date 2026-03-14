@@ -17,6 +17,19 @@ int main(int argc, char *argv[])
 
     const std::string_view op = argv[1];
 
+    auto tryGetID = [](const char *input) -> std::optional<std::int64_t>
+    {
+        try
+        {
+            return getIDFromUserInput(input);
+        }
+        catch (const std::runtime_error &e)
+        {
+            std::cerr << e.what() << '\n';
+            return std::nullopt;
+        }
+    };
+
     if (op == "add")
     {
         if (argc < 3) // no description
@@ -26,31 +39,17 @@ int main(int argc, char *argv[])
     }
     else if (op == "update")
     {
-        if (argc < 3) // no id
+        if (argc < 3)
             displayHelpInfo("update");
-        else
-            try
-            {
-                updateTask(getIDFromUserInput(argv[2]), (argc < 4 ? "" : argv[3]));
-            }
-            catch (const std::runtime_error &e)
-            {
-                std::cerr << e.what() << std::endl;
-            }
+        else if (auto id = tryGetID(argv[2]))
+            updateTask(*id, (argc < 4 ? "" : argv[3]));
     }
     else if (op == "delete")
     {
-        if (argc < 3) // no id
+        if (argc < 3)
             displayHelpInfo("delete");
-        else
-            try
-            {
-                deleteTask(getIDFromUserInput(argv[2]));
-            }
-            catch (const std::runtime_error &e)
-            {
-                std::cerr << e.what() << std::endl;
-            }
+        else if (auto id = tryGetID(argv[2]))
+            deleteTask(*id);
     }
     else if (op == "list")
     {
@@ -59,33 +58,12 @@ int main(int argc, char *argv[])
         else
             listTasks(argv[2]);
     }
-    else if (op == "mark-in-progress")
+    else if (op == "mark-in-progress" || op == "mark-done")
     {
-        if (argc < 3) // no id
-            displayHelpInfo("mark-in-progress");
-        else
-            try
-            {
-                markTaskStatus(getIDFromUserInput(argv[2]), Status::In_Progress);
-            }
-            catch (const std::runtime_error &e)
-            {
-                std::cerr << e.what() << std::endl;
-            }
-    }
-    else if (op == "mark-done")
-    {
-        if (argc < 3) // no id
-            displayHelpInfo("mark-done");
-        else
-            try
-            {
-                markTaskStatus(getIDFromUserInput(argv[2]), Status::Done);
-            }
-            catch (const std::runtime_error &e)
-            {
-                std::cerr << e.what() << std::endl;
-            }
+        if (argc < 3)
+            displayHelpInfo(op);
+        else if (auto id = tryGetID(argv[2]))
+            markTaskStatus(*id, op == "mark-done" ? Status::Done : Status::In_Progress);
     }
     else if (op == "help")
     {
