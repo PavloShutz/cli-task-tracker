@@ -1,6 +1,6 @@
 #include "ctt/task.hpp"
 
-#include <iostream>
+#include <print>
 
 namespace ctt
 {
@@ -33,7 +33,7 @@ namespace ctt
             j["tasks"] += task;
             updateJSON(j);
             updateGlobalId(id + 1);
-            std::cout << std::format("Added new task (ID: {})", id);
+            std::println("Added new task (ID: {})", id);
         }
 
         void updateTask(std::int64_t id, const std::string &description)
@@ -73,12 +73,12 @@ namespace ctt
                 const auto &value = task.value();
                 if ((status == "") || (status == value["status"].get<std::string>()))
                 {
-                    std::cout << std::format("Task #{}:\n\t{}\n\tstatus:{}\n\tcreated:{}\n\tlast updated:{}\n",
-                                             value["id"].get<int64_t>(),
-                                             value["description"].get<std::string>(),
-                                             value["status"].get<std::string>(),
-                                             value["createdAt"].get<std::string>(),
-                                             value["updatedAt"].get<std::string>());
+                    std::print("Task #{}:\n\t{}\n\tstatus:{}\n\tcreated:{}\n\tlast updated:{}\n",
+                               value["id"].get<int64_t>(),
+                               value["description"].get<std::string>(),
+                               value["status"].get<std::string>(),
+                               value["createdAt"].get<std::string>(),
+                               value["updatedAt"].get<std::string>());
                 }
             }
         }
