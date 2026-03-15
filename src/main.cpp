@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
 {
     using namespace ctt::ui;
     using namespace ctt::task;
+    using namespace ctt::utility;
 
     if (argc < 2)
     {

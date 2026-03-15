@@ -1,6 +1,7 @@
 #ifndef TASK_HPP
 #define TASK_HPP
 
+#include <cstdint>
 #include <string>
 
 #include "ctt/utility.hpp"
